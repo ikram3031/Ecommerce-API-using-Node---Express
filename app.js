@@ -6,12 +6,14 @@ const app = express()
 
 //rest packages
 const morgan = require('morgan')
+const cookieParser = require('cookie-parser')
 
 //database
 const connectDB = require('./db/connect')
 
 // Routers
 const authRouter = require('./routes/authRoutes')
+const userRouter = require('./routes/userRoutes')
 
 //middleware
 const notFoundMiddleware = require('./middleware/not-found')
@@ -23,12 +25,21 @@ app.use(morgan('tiny'))
 //express middleware
 app.use(express.json());
 
+//cookie parser
+app.use(cookieParser(process.env.JWT_SECRET));
+
 //home route
 app.get('/', (req,res) => {
     res.send('<h1>E_COMMERCE API</h1>')
 })
 
+app.get('/api/v1', (req,res) => {
+    console.log(req.signedCookies);
+    res.send("test")
+})
+
 app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/users', userRouter)
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)
