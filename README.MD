@@ -242,6 +242,7 @@
 - [] typical REST setup
 - [] import reviewRoutes as reviewRouter in the app.js
 - [] setup app.use('/api/v1/reviews', reviewRouter)
+- [] User can leave one review per order
 
 #### Create Review
 
