@@ -7,6 +7,7 @@ const app = express()
 //rest packages
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
+const fileUpload = require('express-fileupload')
 
 //database
 const connectDB = require('./db/connect')
@@ -28,6 +29,11 @@ app.use(express.json());
 
 //cookie parser
 app.use(cookieParser(process.env.JWT_SECRET));
+
+//static assets
+app.use(express.static('./public'))
+//file upload
+app.use(fileUpload())
 
 //home route
 app.get('/', (req,res) => {
