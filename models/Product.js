@@ -67,7 +67,21 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
   },
-{ timestamps: true }
+  //added mongoose virtual after timestamp
+{ timestamps: true, toJSON:{ virtuals:true }, toObject:{ virtuals:true } }
 );
+
+//add review virtually
+ProductSchema.virtual('reviews', {
+  ref: 'Review',
+  localField: '_id',
+  foreignField: 'product',
+  justOne: false,
+})
+
+//remove all reviews after deleting the product
+ProductSchema.pre('remove', async function(next){
+  await this.model('Review').deleteMany({product:this._id})
+})
 
 module.exports = mongoose.model('Product', ProductSchema);

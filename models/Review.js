@@ -1,3 +1,4 @@
+const { METHOD_FAILURE } = require('http-status-codes');
 const mongoose = require('mongoose');
 
 const ReviewSchema = mongoose.Schema(
@@ -34,5 +35,39 @@ const ReviewSchema = mongoose.Schema(
 
 // User can leave only one review
 ReviewSchema.index({ product: 1, user: 1}, { unique : true });
+
+//Aggregate Pipeline to setup average rating & number of reviews
+ReviewSchema.statics.calculateAverageRating = async function (productId) {
+  const result = await this.aggregate([
+    { $match: { product: productId } },
+    {
+      $group: {
+        _id: null,
+        averageRating: { $avg: '$rating' },
+        numOfReviews: { $sum: 1 },
+      },
+    },
+  ]);
+
+  try {
+    await this.model('Product').findOneAndUpdate(
+      { _id: productId },
+      {
+        averageRating: Math.ceil(result[0]?.averageRating || 0),
+        numOfReviews: result[0]?.numOfReviews || 0,
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+ReviewSchema.post('save', async function(){
+  await this.constructor.calculateAverageRating(this.product);
+});
+
+ReviewSchema.post('remove', async function(){
+  await this.constructor.calculateAverageRating(this.product);
+});
 
 module.exports = mongoose.model('Review', ReviewSchema)
