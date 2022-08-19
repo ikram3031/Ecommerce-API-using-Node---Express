@@ -1,6 +1,6 @@
 ## Hosted Project
 
-[E-Commerce API Heroku URL]()
+[E-Commerce API Heroku URL](https://ecommerce-api-ihkhan.herokuapp.com/)
 
 #### Setup Basic Express Server
 
